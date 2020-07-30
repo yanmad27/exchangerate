@@ -1,31 +1,32 @@
 import React from 'react';
-import * as HttpClient from './Services/HttpClient';
+import * as HttpClient from '../../Services/HttpClient';
 import { Line } from 'react-chartjs-2';
 import { randomColor } from 'randomcolor';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const Chart = () => {
+
     const fetch = async () => {
         let startAt = date.startAt.getFullYear() + "-" + (date.startAt.getMonth() + 1) + "-" + date.startAt.getDate();
         let endAt = date.endAt.getFullYear() + "-" + (date.endAt.getMonth() + 1) + "-" + date.endAt.getDate();
         const res = await HttpClient.callApi(`history?start_at=${startAt}&end_at=${endAt}`);
-        // throw new Error('I crashed!');
         const labels = []
         const tmp = {};
-        Object.keys(res.rates).sort().map((key, index) => {
+        // Collect rate arcoding to currency
+        Object.keys(res.rates).sort().forEach((key, index) => {
             labels.push(key);
-            Object.keys(res.rates[key]).sort().map(key1 => {
+            Object.keys(res.rates[key]).sort().forEach(key1 => {
                 if (tmp[key1] === undefined) tmp[key1] = [];
                 tmp[key1].push(res.rates[key][key1]);
             })
         })
 
+        //create linechart data
         setState({
             labels,
             datasets: Object.keys(tmp).sort().map((value, index) => {
                 const newcolor = randomColor();
-                console.log(value)
                 return {
                     label: value,
                     fill: false,
@@ -69,17 +70,21 @@ const Chart = () => {
 
     return (
         <div>
-            <span   >Start at:</span   >
-            <DatePicker
-                selected={date.startAt}
-                onChange={handleChange('startAt')}
-            />
-            <span   >End at:</span >
-            <DatePicker
-                selected={date.endAt}
-                onChange={handleChange('endAt')}
-            />
-            <button onClick={fetch}>Fetch</button>
+            <div style={{ display: "flex", flexDirection: "row", justifyContent: "center" }}>
+
+                <span>Start at:</span>
+                <DatePicker
+                    selected={date.startAt}
+                    onChange={handleChange('startAt')}
+                />
+                <span>End at:</span>
+                <DatePicker
+                    selected={date.endAt}
+                    onChange={handleChange('endAt')}
+                />
+                <button onClick={fetch}>Fetch</button>
+            </div>
+
             <Line
                 data={state}
                 options={{

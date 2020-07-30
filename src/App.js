@@ -1,5 +1,5 @@
 import React from 'react';
-import Chart from './Chart';
+import Chart from './Component/LineChart/Chart';
 import './App.css';
 
 function App() {
